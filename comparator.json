@@ -1,0 +1,22 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "MengerTheorem.card_le_of_separates",
+    "MengerTheorem.exists_separator_and_paths",
+    "MengerTheorem.exists_separator_and_paths_of_not_adj",
+    "MengerTheorem.isEdgeReachable_iff",
+    "MengerTheorem.isEdgeConnected_iff",
+    "HamiltonianCycles.isHamiltonian_sup_edge_iff",
+    "HamiltonianCycles.ore",
+    "HamiltonianCycles.dirac",
+    "HamiltonianCycles.chvatal_erdos"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": true
+}

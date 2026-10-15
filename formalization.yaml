@@ -1,0 +1,194 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Menger's theorem and Hamiltonian cycles"
+  description: >-
+    A Lean 4 / Mathlib formalization of Menger's theorem for finite graphs (set form with a
+    minimum separator and as many vertex-disjoint paths, two-vertex form, edge form for Mathlib's
+    IsEdgeReachable, and the global edge form for Mathlib's IsEdgeConnected) and of classical
+    sufficient conditions for Hamiltonian cycles: the Bondy–Chvátal closure step, Ore's and
+    Dirac's theorems, and the Chvátal–Erdős theorem (k-connected with independence number at most
+    k implies Hamiltonian), whose proof uses Menger's theorem through the fan lemma.
+  authors:
+    - "Juan Pablo Traverso Gianini"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Juan Pablo Traverso Gianini"
+
+classification:
+  arxiv: ["math.CO"]
+  msc2020: ["05C40", "05C45", "05C38"]
+
+sources:
+  - title: "Zur allgemeinen Kurventheorie"
+    authors:
+      - "Karl Menger"
+    id: "doi:10.4064/fm-10-1-96-115"
+    type: "paper"
+    location: "Fundamenta Mathematicae 10 (1927), 96–115"
+    relationship: "formalizes"
+    note: "Menger's theorem (vertex form); the edge forms are its standard variants. The formal proof follows Diestel's induction on the number of edges, not Menger's original argument."
+    license: "unknown"
+    author_endorsement: "n/a"
+  - title: "Some theorems on abstract graphs"
+    authors:
+      - "G. A. Dirac"
+    id: "doi:10.1112/plms/s3-2.1.69"
+    type: "paper"
+    location: "Proceedings of the London Mathematical Society (3) 2 (1952), 69–81"
+    relationship: "formalizes"
+    note: "Minimum degree at least n/2 implies Hamiltonian (n ≥ 3); derived here from Ore's theorem."
+    license: "unknown"
+    author_endorsement: "n/a"
+  - title: "Note on Hamilton circuits"
+    authors:
+      - "Øystein Ore"
+    id: "doi:10.2307/2308928"
+    type: "paper"
+    location: "American Mathematical Monthly 67 (1960), 55"
+    relationship: "formalizes"
+    note: "Degree sum at least n for non-adjacent pairs implies Hamiltonian; proved here through the Bondy–Chvátal closure."
+    license: "unknown"
+    author_endorsement: "n/a"
+  - title: "A method in graph theory"
+    authors:
+      - "J. A. Bondy"
+      - "V. Chvátal"
+    id: "doi:10.1016/0012-365X(76)90078-9"
+    type: "paper"
+    location: "Discrete Mathematics 15 (1976), 111–135"
+    relationship: "formalizes"
+    note: "The closure step for Hamiltonicity (degree sum at least n)."
+    license: "unknown"
+    author_endorsement: "n/a"
+  - title: "A note on Hamiltonian circuits"
+    authors:
+      - "V. Chvátal"
+      - "P. Erdős"
+    id: "doi:10.1016/0012-365X(72)90079-9"
+    type: "paper"
+    location: "Discrete Mathematics 2 (1972), 111–113"
+    relationship: "formalizes"
+    note: "Connectivity at least the independence number implies Hamiltonian (n ≥ 3)."
+    license: "unknown"
+    author_endorsement: "n/a"
+  - title: "Graph Theory (5th edition)"
+    authors:
+      - "Reinhard Diestel"
+    id: "doi:10.1007/978-3-662-53622-3"
+    type: "book"
+    location: "Graduate Texts in Mathematics 173, Springer (2017)"
+    relationship: "background"
+    note: "Theorem 3.3.1 (second proof), followed for the set form of Menger's theorem."
+    license: "unknown"
+    author_endorsement: "n/a"
+
+status:
+  scope: >-
+    Proved for finite simple graphs (any universe): the four forms of Menger's theorem listed in
+    the description plus weak duality, the Bondy–Chvátal closure step, Ore's, Dirac's and the
+    Chvátal–Erdős theorems for Mathlib's IsHamiltonian.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+
+automation:
+  methods:
+    - method: "autonomous"
+      models: ["Aristotle (Harmonic)"]
+      framework: "Aristotle CLI"
+      tool_setup: >-
+        Produced all proofs in two runs from the formal statements and proof plans (Menger's
+        theorem first, then the Hamiltonian results using it); each return was audited
+        (statements and headers unchanged, no added axioms) and rebuilt locally.
+      cost:
+        wall_time: "about one hour"
+        spend_usd: "not tracked"
+        hardware: "API-only"
+      prompting_notes: "Formal statements and proof plans supplied for each run."
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: >-
+        Statement design (separators, vertex connectivity, forms of Menger's theorem aligned with
+        Mathlib's edge connectivity), proof plans, integration and review of the Aristotle
+        returns, and the Palomar packaging, checked with `lake build` and `#print axioms` (Lean
+        v4.35.0-rc3, Mathlib c55e6e786f49471c72fbddbec5415808896aec1e).
+      cost:
+        wall_time: "a few hours"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "Natural-language instructions in Spanish, directed by the author."
+  spend_usd: "subscription-based"
+  notes: >-
+    The results were chosen by the human author; the Lean proofs are AI-generated and
+    mechanically verified (no `sorry`, axioms limited to propext, Classical.choice and
+    Quot.sound, identical elaborated types for the Challenge/Solution pair).
+
+fidelity:
+  divergences: >-
+    Menger's minimax is stated existentially (a separator X together with |X| disjoint paths),
+    which with weak duality is the equality of the optimum values; paths are Mathlib walks with
+    IsPath, vertex-disjointness is disjointness of supports, edge-disjointness of edge lists.
+    Vertex connectivity is defined in the Challenge (more than k vertices, connected after deleting
+    any set of fewer than k vertices, via `G.induce Sᶜ`). The independence number condition is
+    stated as "every independent set has at most k vertices". Ore's and Dirac's degree conditions
+    use Mathlib's `degree` and `minDegree` with integer arithmetic (n ≤ deg u + deg v,
+    n ≤ 2 · minDegree).
+
+review:
+  status: "agent-reviewed"
+  reviewers:
+    - "Claude Opus 5.5 (AI agent in Claude Code, acting for the author)"
+  notes: >-
+    Agent review by Claude Opus 5.5, distinct from the mechanical verification: the agent
+    designed and compared the statements with the classical theorems, checked that the
+    Aristotle returns left every statement, definition and header unchanged, and confirmed by
+    `lake build`, `#print axioms` and a comparison of the fully elaborated Challenge and Solution
+    types that the proofs use no `sorry` and only propext, Classical.choice and Quot.sound. The
+    author directed the work and approved the statements. No independent human mathematical
+    review has been performed. The results are classical; no mathematical novelty is claimed.
+
+alignment:
+  namespace: "MengerTheorem, HamiltonianCycles"
+  statements:
+    - source: "Weak duality for disjoint paths and separators"
+      lean: "MengerTheorem.card_le_of_separates"
+      module: "Challenge"
+      status: "proved"
+    - source: "Menger (1927), set form"
+      lean: "MengerTheorem.exists_separator_and_paths"
+      module: "Challenge"
+      status: "proved"
+    - source: "Menger (1927), two-vertex form"
+      lean: "MengerTheorem.exists_separator_and_paths_of_not_adj"
+      module: "Challenge"
+      status: "proved"
+    - source: "Menger's theorem, edge form"
+      lean: "MengerTheorem.isEdgeReachable_iff"
+      module: "Challenge"
+      status: "proved"
+    - source: "Menger's theorem, global edge form"
+      lean: "MengerTheorem.isEdgeConnected_iff"
+      module: "Challenge"
+      status: "proved"
+    - source: "Bondy–Chvátal (1976), closure step"
+      lean: "HamiltonianCycles.isHamiltonian_sup_edge_iff"
+      module: "Challenge"
+      status: "proved"
+    - source: "Ore (1960)"
+      lean: "HamiltonianCycles.ore"
+      module: "Challenge"
+      status: "proved"
+    - source: "Dirac (1952)"
+      lean: "HamiltonianCycles.dirac"
+      module: "Challenge"
+      status: "proved"
+    - source: "Chvátal–Erdős (1972)"
+      lean: "HamiltonianCycles.chvatal_erdos"
+      module: "Challenge"
+      status: "proved"
+
+acknowledgements: >-
+  Mathlib and the Lean community; Harmonic's Aristotle.
