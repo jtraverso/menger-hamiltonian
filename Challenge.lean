@@ -8,9 +8,9 @@ module
 public import Mathlib
 
 /-!
-# Menger's theorem and sufficient conditions for Hamiltonian cycles
+# Menger's theorem, Hamiltonian cycles, long cycles and pancyclicity
 
-For a finite simple graph `G`:
+For a finite simple graph `G` on `n` vertices with `e(G)` edges:
 
 * `MengerTheorem.card_le_of_separates`: if `X` separates `A` from `B` (every walk from `A` to
   `B` meets `X`), any family of pairwise vertex-disjoint `A`–`B` paths has at most `|X|`
@@ -36,6 +36,13 @@ For a finite simple graph `G`:
   then `G` is Hamiltonian.
 * `HamiltonianCycles.chvatal_erdos`: **Chvátal–Erdős (1972).** If `n ≥ 3`, `G` is
   `k`-connected and every independent set has at most `k` vertices, then `G` is Hamiltonian.
+* `LongPathsCycles.erdos_gallai_path`: **Erdős–Gallai (1959), paths.** If `G` has no path on `k`
+  vertices, then `2 e(G) ≤ (k − 2) n`.
+* `LongPathsCycles.erdos_gallai_cycle`: **Erdős–Gallai (1959), cycles.** If `k ≥ 3` and every
+  cycle of `G` has length less than `k`, then `2 e(G) ≤ (k − 1)(n − 1)`.
+* `LongPathsCycles.bondy`: **Bondy (1971).** If `G` is Hamiltonian, `n ≥ 3` and `n² ≤ 4 e(G)`,
+  then `G` is pancyclic (it has a cycle of every length `ℓ` with `3 ≤ ℓ ≤ n`), or `n` is even and
+  `G` is isomorphic to `K_{n/2, n/2}`.
 
 `X` separates `A` from `B` (`MengerTheorem.Separates`) when every walk from `A` to `B` passes
 through `X`. `G` is `k`-connected (`HamiltonianCycles.IsKConnected`) when it has more than `k`
@@ -149,3 +156,37 @@ theorem chvatal_erdos [Fintype V] [DecidableEq V] (G : SimpleGraph V)
   sorry
 
 end HamiltonianCycles
+
+namespace LongPathsCycles
+
+open Finset
+
+variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
+
+omit [DecidableEq V] in
+/-- **Erdős–Gallai (1959), paths.** A finite graph on `n` vertices with no path on `k` vertices
+has at most `(k − 2) n / 2` edges. -/
+theorem erdos_gallai_path {k : ℕ}
+    (h : ∀ (u v : V) (p : G.Walk u v), p.IsPath → p.length + 2 ≤ k) :
+    2 * #G.edgeFinset ≤ (k - 2) * Fintype.card V := by
+  sorry
+
+omit [DecidableEq V] in
+/-- **Erdős–Gallai (1959), cycles.** If `k ≥ 3` and a finite graph on `n` vertices has no cycle of
+length at least `k`, then it has at most `(k − 1)(n − 1) / 2` edges. -/
+theorem erdos_gallai_cycle {k : ℕ} (hk : 3 ≤ k)
+    (h : ∀ (u : V) (c : G.Walk u u), c.IsCycle → c.length < k) :
+    2 * #G.edgeFinset ≤ (k - 1) * (Fintype.card V - 1) := by
+  sorry
+
+/-- **Bondy's theorem (1971).** A Hamiltonian graph on `n ≥ 3` vertices with at least `n² / 4`
+edges is pancyclic, unless `n` is even and the graph is `K_{n/2, n/2}`. -/
+theorem bondy (hn : 3 ≤ Fintype.card V) (hH : G.IsHamiltonian)
+    (hE : Fintype.card V ^ 2 ≤ 4 * #G.edgeFinset) :
+    (∀ ℓ, 3 ≤ ℓ → ℓ ≤ Fintype.card V → ∃ (u : V) (c : G.Walk u u), c.IsCycle ∧ c.length = ℓ) ∨
+      (Even (Fintype.card V) ∧
+        Nonempty (G ≃g completeBipartiteGraph (Fin (Fintype.card V / 2))
+          (Fin (Fintype.card V / 2)))) := by
+  sorry
+
+end LongPathsCycles

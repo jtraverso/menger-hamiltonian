@@ -2,14 +2,18 @@
 version: "v0.4"
 
 project:
-  name: "Menger's theorem and Hamiltonian cycles"
+  name: "Menger's theorem, Hamiltonian cycles, long cycles and pancyclicity"
   description: >-
     A Lean 4 / Mathlib formalization of Menger's theorem for finite graphs (set form with a
     minimum separator and as many vertex-disjoint paths, two-vertex form, edge form for Mathlib's
     IsEdgeReachable, and the global edge form for Mathlib's IsEdgeConnected) and of classical
     sufficient conditions for Hamiltonian cycles: the Bondy–Chvátal closure step, Ore's and
     Dirac's theorems, and the Chvátal–Erdős theorem (k-connected with independence number at most
-    k implies Hamiltonian), whose proof uses Menger's theorem through the fan lemma.
+    k implies Hamiltonian), whose proof uses Menger's theorem through the fan lemma. Version 2 adds
+    the Erdős–Gallai theorems on long paths and cycles (no path on k vertices implies
+    2e ≤ (k − 2)n; no cycle of length at least k ≥ 3 implies 2e ≤ (k − 1)(n − 1)) and Bondy's
+    pancyclicity theorem (a Hamiltonian graph with at least n²/4 edges is pancyclic or is
+    K_{n/2,n/2}), proved on top of the same library.
   authors:
     - "Juan Pablo Traverso Gianini"
   license: "Apache-2.0"
@@ -18,7 +22,7 @@ project:
 
 classification:
   arxiv: ["math.CO"]
-  msc2020: ["05C40", "05C45", "05C38"]
+  msc2020: ["05C40", "05C45", "05C38", "05C35"]
 
 sources:
   - title: "Zur allgemeinen Kurventheorie"
@@ -83,12 +87,37 @@ sources:
     note: "Theorem 3.3.1 (second proof), followed for the set form of Menger's theorem."
     license: "unknown"
     author_endorsement: "n/a"
+  - title: "On maximal paths and circuits of graphs"
+    authors:
+      - "P. Erdős"
+      - "T. Gallai"
+    id: "doi:10.1007/BF02024498"
+    type: "paper"
+    location: "Acta Mathematica Academiae Scientiarum Hungaricae 10 (1959), 337–356"
+    relationship: "formalizes"
+    note: "Version 2: the extremal bounds for graphs without long paths and without long cycles."
+    license: "all rights reserved"
+    author_endorsement: "n/a"
+  - title: "Pancyclic graphs I"
+    authors:
+      - "J. A. Bondy"
+    id: "doi:10.1016/0095-8956(71)90016-5"
+    type: "paper"
+    location: "Journal of Combinatorial Theory, Series B 11 (1971), 80–84"
+    relationship: "formalizes"
+    note: "Version 2: Hamiltonian graphs with at least n²/4 edges are pancyclic or K_{n/2,n/2}."
+    license: "all rights reserved"
+    author_endorsement: "n/a"
 
 status:
   scope: >-
-    Proved for finite simple graphs (any universe): the four forms of Menger's theorem listed in
-    the description plus weak duality, the Bondy–Chvátal closure step, Ore's, Dirac's and the
-    Chvátal–Erdős theorems for Mathlib's IsHamiltonian.
+    Proved for finite simple graphs (any universe), under the hypotheses of each statement: the
+    four forms of Menger's theorem listed in the description plus weak duality; the Bondy–Chvátal
+    closure step for non-adjacent u, v with deg u + deg v ≥ n; Ore's and Dirac's theorems for
+    n ≥ 3 under their degree conditions; the Chvátal–Erdős theorem for n ≥ 3, k-connected graphs
+    with independence number at most k; and (version 2) the Erdős–Gallai bounds for graphs with
+    no path on k vertices, resp. (k ≥ 3) no cycle of length at least k, and Bondy's theorem for
+    Hamiltonian graphs with n ≥ 3 and n² ≤ 4e(G).
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: []
@@ -99,11 +128,12 @@ automation:
       models: ["Aristotle (Harmonic)"]
       framework: "Aristotle CLI"
       tool_setup: >-
-        Produced all proofs in two runs from the formal statements and proof plans (Menger's
-        theorem first, then the Hamiltonian results using it); each return was audited
-        (statements and headers unchanged, no added axioms) and rebuilt locally.
+        Produced all proofs in three runs from the formal statements and proof plans (Menger's
+        theorem first, then the Hamiltonian results using it, and for version 2 the Erdős–Gallai
+        and Bondy theorems on top of the same library); each return was audited (statements and
+        headers unchanged, library unchanged, no added axioms) and rebuilt locally.
       cost:
-        wall_time: "about one hour"
+        wall_time: "about two and a half hours in total"
         spend_usd: "not tracked"
         hardware: "API-only"
       prompting_notes: "Formal statements and proof plans supplied for each run."
@@ -112,7 +142,8 @@ automation:
       framework: "Claude Code (Anthropic)"
       tool_setup: >-
         Statement design (separators, vertex connectivity, forms of Menger's theorem aligned with
-        Mathlib's edge connectivity), proof plans, integration and review of the Aristotle
+        Mathlib's edge connectivity; for version 2 the long-cycle statements, checked by brute force
+        on all graphs with at most 8 vertices), proof plans, integration and review of the Aristotle
         returns, and the Palomar packaging, checked with `lake build` and `#print axioms` (Lean
         v4.35.0-rc3, Mathlib c55e6e786f49471c72fbddbec5415808896aec1e).
       cost:
@@ -135,7 +166,11 @@ fidelity:
     any set of fewer than k vertices, via `G.induce Sᶜ`). The independence number condition is
     stated as "every independent set has at most k vertices". Ore's and Dirac's degree conditions
     use Mathlib's `degree` and `minDegree` with integer arithmetic (n ≤ deg u + deg v,
-    n ≤ 2 · minDegree).
+    n ≤ 2 · minDegree). Version 2: "no path on k vertices" is stated as "every path has length at
+    most k − 2" and "no cycle of length at least k" as "every cycle has length less than k"; the
+    edge bounds are stated without division (2e ≤ (k − 2)n, 2e ≤ (k − 1)(n − 1), with truncated
+    natural subtraction), and Bondy's exceptional graph is given up to Mathlib graph isomorphism
+    with `completeBipartiteGraph (Fin (n/2)) (Fin (n/2))`.
 
 review:
   status: "agent-reviewed"
@@ -187,6 +222,18 @@ alignment:
       status: "proved"
     - source: "Chvátal–Erdős (1972)"
       lean: "HamiltonianCycles.chvatal_erdos"
+      module: "Challenge"
+      status: "proved"
+    - source: "Erdős–Gallai (1959): no path on k vertices implies 2e ≤ (k − 2)n"
+      lean: "LongPathsCycles.erdos_gallai_path"
+      module: "Challenge"
+      status: "proved"
+    - source: "Erdős–Gallai (1959): no cycle of length ≥ k implies 2e ≤ (k − 1)(n − 1)"
+      lean: "LongPathsCycles.erdos_gallai_cycle"
+      module: "Challenge"
+      status: "proved"
+    - source: "Bondy (1971): Hamiltonian with e ≥ n²/4 implies pancyclic or K_{n/2,n/2}"
+      lean: "LongPathsCycles.bondy"
       module: "Challenge"
       status: "proved"
 

@@ -10,7 +10,10 @@
     "HamiltonianCycles.isHamiltonian_sup_edge_iff",
     "HamiltonianCycles.ore",
     "HamiltonianCycles.dirac",
-    "HamiltonianCycles.chvatal_erdos"
+    "HamiltonianCycles.chvatal_erdos",
+    "LongPathsCycles.erdos_gallai_path",
+    "LongPathsCycles.erdos_gallai_cycle",
+    "LongPathsCycles.bondy"
   ],
   "definition_names": [],
   "permitted_axioms": [

@@ -7,6 +7,7 @@ module
 
 public import Mathlib
 public import MengerHamilton.Hamiltonian
+public import LongCyclesLib.LongCycles
 
 /-!
 # Proofs of the statements in `Challenge.lean`
@@ -16,7 +17,11 @@ The definitions below are verbatim copies of those in `Challenge.lean`; they coi
 in `MengerHamilton/`: Menger's theorem in `Menger.lean` and `MengerCore.lean` (Diestel's induction
 on the number of edges; the edge form through the line graph), the Hamiltonian results in
 `Hamiltonian.lean` and its auxiliary files (the Bondy–Chvátal closure step, Ore and Dirac by
-closure, Chvátal–Erdős by the fan lemma and a longest cycle).
+closure, Chvátal–Erdős by the fan lemma and a longest cycle). The long-cycle results (version 2)
+are proved in `LongCyclesLib/` on top of `MengerHamilton/`: Dirac's long-cycle lemma by a longest
+path, Erdős–Gallai for cycles by induction (deleting low-degree vertices, splitting at cut
+vertices), Erdős–Gallai for paths via an apex vertex, and Bondy's theorem by counting neighbours
+along a Hamiltonian cycle and induction on the number of vertices.
 -/
 
 @[expose] public section
@@ -121,3 +126,37 @@ theorem chvatal_erdos [Fintype V] [DecidableEq V] (G : SimpleGraph V)
   Hamiltonicity.chvatal_erdos G hn k hk hα
 
 end HamiltonianCycles
+
+namespace LongPathsCycles
+
+open Finset
+
+variable {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj]
+
+omit [DecidableEq V] in
+/-- **Erdős–Gallai (1959), paths.** A finite graph on `n` vertices with no path on `k` vertices
+has at most `(k − 2) n / 2` edges. -/
+theorem erdos_gallai_path {k : ℕ}
+    (h : ∀ (u v : V) (p : G.Walk u v), p.IsPath → p.length + 2 ≤ k) :
+    2 * #G.edgeFinset ≤ (k - 2) * Fintype.card V :=
+  LongCycles.erdos_gallai_path G h
+
+omit [DecidableEq V] in
+/-- **Erdős–Gallai (1959), cycles.** If `k ≥ 3` and a finite graph on `n` vertices has no cycle of
+length at least `k`, then it has at most `(k − 1)(n − 1) / 2` edges. -/
+theorem erdos_gallai_cycle {k : ℕ} (hk : 3 ≤ k)
+    (h : ∀ (u : V) (c : G.Walk u u), c.IsCycle → c.length < k) :
+    2 * #G.edgeFinset ≤ (k - 1) * (Fintype.card V - 1) :=
+  LongCycles.erdos_gallai_cycle G hk h
+
+/-- **Bondy's theorem (1971).** A Hamiltonian graph on `n ≥ 3` vertices with at least `n² / 4`
+edges is pancyclic, unless `n` is even and the graph is `K_{n/2, n/2}`. -/
+theorem bondy (hn : 3 ≤ Fintype.card V) (hH : G.IsHamiltonian)
+    (hE : Fintype.card V ^ 2 ≤ 4 * #G.edgeFinset) :
+    (∀ ℓ, 3 ≤ ℓ → ℓ ≤ Fintype.card V → ∃ (u : V) (c : G.Walk u u), c.IsCycle ∧ c.length = ℓ) ∨
+      (Even (Fintype.card V) ∧
+        Nonempty (G ≃g completeBipartiteGraph (Fin (Fintype.card V / 2))
+          (Fin (Fintype.card V / 2)))) :=
+  LongCycles.bondy G hn hH hE
+
+end LongPathsCycles

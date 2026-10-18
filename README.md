@@ -1,4 +1,4 @@
-# Menger's theorem and Hamiltonian cycles in Lean 4
+# Menger's theorem, Hamiltonian cycles, long cycles and pancyclicity in Lean 4
 
 Author and maintainer: **Juan Pablo Traverso Gianini**. Licence: Apache-2.0 (see `LICENSE`).
 
@@ -25,6 +25,14 @@ This repository formalizes, for finite simple graphs:
 5. **Chvátal–Erdős (1972):** if `n ≥ 3`, `G` is `k`-connected, and every independent set has at
    most `k` vertices, then `G` is Hamiltonian.
 
+Version 2 adds, for a graph `G` on `n` vertices with `e(G)` edges:
+
+6. **Erdős–Gallai (1959), paths:** if `G` has no path on `k` vertices, then `2 e(G) ≤ (k − 2) n`.
+7. **Erdős–Gallai (1959), cycles:** if `k ≥ 3` and every cycle has length less than `k`, then
+   `2 e(G) ≤ (k − 1)(n − 1)`.
+8. **Bondy (1971):** if `G` is Hamiltonian, `n ≥ 3` and `n² ≤ 4 e(G)`, then `G` is pancyclic (it
+   has a cycle of every length from 3 to `n`), or `n` is even and `G ≅ K_{n/2,n/2}`.
+
 Hamiltonicity is Mathlib's `SimpleGraph.IsHamiltonian`. Two notions are defined in the Challenge,
 since Mathlib has neither:
 - **separators:** `X` separates `A` from `B` when every walk from `A` to `B` passes through `X`;
@@ -33,9 +41,9 @@ since Mathlib has neither:
 
 ## Files
 
-- [`Challenge.lean`](Challenge.lean): the audited statements, in the namespaces `MengerTheorem`
-  and `HamiltonianCycles`. It imports only Mathlib.
-- [`Solution.lean`](Solution.lean) and `MengerHamilton/`: the proofs.
+- [`Challenge.lean`](Challenge.lean): the audited statements, in the namespaces `MengerTheorem`,
+  `HamiltonianCycles` and (version 2) `LongPathsCycles`. It imports only Mathlib.
+- [`Solution.lean`](Solution.lean), `MengerHamilton/` and (version 2) `LongCyclesLib/`: the proofs.
 - [`comparator.json`](comparator.json): the theorems that are compared.
 - [`MATHLIB_DEFINITIONS.md`](MATHLIB_DEFINITIONS.md): verbatim copies of the Mathlib definitions
   used.
@@ -64,6 +72,17 @@ since Mathlib has neither:
   vertex `x` is off `C`, Menger's theorem gives `k` paths from `x` to `C` that share only `x`
   (the fan lemma). The successors on `C` of their endpoints, together with `x`, form `k + 1`
   vertices. These are not independent, and every possible edge among them yields a longer cycle.
+* **Long cycles** (version 2, `LongCyclesLib/`, built on the cyclic arrangements of
+  `MengerHamilton/`).
+  - Dirac's lemma: a graph without a cut vertex in which every degree is at least `k/2` has a
+    cycle of length at least `k`, by a longest-path argument.
+  - Erdős–Gallai for cycles, by induction: delete a vertex of degree at most `(k − 1)/2`, or split
+    the graph at a cut vertex; otherwise Dirac's lemma gives a long cycle.
+  - Erdős–Gallai for paths: apply the cycle version to `G` plus a vertex adjacent to all others.
+  - Bondy: if there is no cycle of length `n − 1`, then along a Hamiltonian cycle
+    `v_i ~ v_{i+p}` forbids `v_{i+1} ~ v_{i+p+2}`, so `deg v_i + deg v_{i+1} ≤ n` and `4e ≤ n²`;
+    equality forces `K_{n/2,n/2}`. Otherwise, depending on the degree of the vertex missed by an
+    `(n − 1)`-cycle, either all lengths close directly or induction on `n` applies.
 
 ## Sources
 
@@ -77,14 +96,18 @@ since Mathlib has neither:
   doi:10.1016/0012-365X(72)90079-9.
 * J. A. Bondy, V. Chvátal, *A method in graph theory*, Discrete Math. 15 (1976) 111–135,
   doi:10.1016/0012-365X(76)90078-9.
+* P. Erdős, T. Gallai, *On maximal paths and circuits of graphs*, Acta Math. Acad. Sci. Hungar. 10
+  (1959) 337–356, doi:10.1007/BF02024498.
+* J. A. Bondy, *Pancyclic graphs I*, J. Combin. Theory Ser. B 11 (1971) 80–84,
+  doi:10.1016/0095-8956(71)90016-5.
 * R. Diestel, *Graph Theory*, 5th ed., Graduate Texts in Mathematics 173, Springer (2017),
   doi:10.1007/978-3-662-53622-3.
 
 ## Authorship and use of AI
 
 The author chose the results. The statements and proof plans were written with Claude in Claude
-Code. Harmonic's Aristotle produced the proofs in two runs: Menger first, then the Hamiltonian
-results using Menger. The proofs were audited and rebuilt locally. Lean checks everything
+Code. Harmonic's Aristotle produced the proofs in three runs: Menger first, then the Hamiltonian
+results using Menger, and for version 2 the long-cycle results on top of the same library. The proofs were audited and rebuilt locally. Lean checks everything
 mechanically. See `formalization.yaml`.
 
 ## Building

@@ -1,4 +1,4 @@
-# Mathlib definitions used in Challenge.lean (Menger's theorem and Hamiltonian cycles)
+# Mathlib definitions used in Challenge.lean (Menger's theorem, Hamiltonian cycles, long cycles and pancyclicity)
 
 Verbatim excerpts of the Mathlib definitions used by the statements in `Challenge.lean`, at the
 pinned Mathlib revision `c55e6e786f49471c72fbddbec5415808896aec1e` (tag `v4.35.0-rc3`, repository
@@ -328,4 +328,51 @@ noncomputable def ncard (s : Set α) : ℕ := ENat.toNat s.encard
 /-- `card α` is the number of elements in `α`, defined when `α` is a fintype. -/
 def card (α) [Fintype α] : ℕ :=
   (@univ α _).card
+```
+
+## SimpleGraph.Walk.length
+
+`Mathlib/Combinatorics/SimpleGraph/Walk/Basic.lean`, line 87:
+
+```lean
+/-- The length of a walk is the number of edges/darts along it. -/
+def length {u v : V} : G.Walk u v → ℕ
+  | nil => 0
+  | cons _ q => q.length.succ
+```
+
+## SimpleGraph.edgeFinset
+
+`Mathlib/Combinatorics/SimpleGraph/Finite.lean`, line 59:
+
+```lean
+/-- The `edgeSet` of the graph as a `Finset`. -/
+def edgeFinset : Finset (Sym2 V) :=
+  Set.toFinset G.edgeSet
+```
+
+## SimpleGraph.completeBipartiteGraph
+
+`Mathlib/Combinatorics/SimpleGraph/Basic.lean`, line 156:
+
+```lean
+/-- Two vertices are adjacent in the complete bipartite graph on two vertex types
+if and only if they are not from the same side.
+Any bipartite graph may be regarded as a subgraph of one of these. -/
+@[simps]
+def completeBipartiteGraph (V W : Type*) : SimpleGraph (V ⊕ W) where
+  Adj v w := v.isLeft ∧ w.isRight ∨ v.isRight ∧ w.isLeft
+```
+
+## SimpleGraph.Iso (notation ≃g)
+
+`Mathlib/Combinatorics/SimpleGraph/Maps.lean`, line 307:
+
+```lean
+/-- A graph isomorphism is a bijective map on vertex sets that respects adjacency relations.
+
+The notation `G ≃g G'` represents the type of graph isomorphisms.
+-/
+abbrev Iso :=
+  RelIso G.Adj G'.Adj
 ```
